@@ -1,0 +1,43 @@
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db.js');
+
+const usuario = sequelize.define('usuario', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    rut: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    nombre: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    apellido: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    edad: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+}, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    freezeTableName: true    
+});
+
+module.exports = usuario;
+
