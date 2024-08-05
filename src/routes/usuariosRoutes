@@ -1,0 +1,21 @@
+const express = require('express');
+const router = express.Router();
+const usuarioController = require('../controllers/usuariosController'); 
+const verifyToken = require('../middleware/authMiddlewareV2');
+
+// Ruta para obtener todos los usuarios (protegida)
+router.get('/', verifyToken, usuarioController.getUsers);
+
+// Ruta para obtener un usuario por ID (protegida)
+router.get('/:id', verifyToken, usuarioController.getById);
+
+// Ruta para crear un nuevo usuario (sin protección, para que se puedan registrar)
+router.post('/', usuarioController.createUser);
+
+// Ruta para actualizar un usuario por ID (protegida)
+router.put('/:id', verifyToken, usuarioController.updateUser);
+
+// Ruta para eliminar un usuario por ID (protegida)
+router.delete('/:id', verifyToken, usuarioController.deleteUser);
+
+module.exports = router;

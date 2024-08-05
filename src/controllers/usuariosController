@@ -1,0 +1,103 @@
+// src/controllers/userController.js
+
+const bcrypt = require('bcrypt');
+const userService = require('../services/usuarioService');
+const { body, validationResult } = require('express-validator');
+
+const validateUser = [
+    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
+    body('apellido').notEmpty().withMessage('El apellido es obligatorio'),
+    body('rut').notEmpty().withMessage('El RUT es obligatorio'),
+    body('email').isEmail().withMessage('Debe ser un correo electrónico válido'),
+    body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
+    body('edad').isInt({ min: 18 }).withMessage('La edad debe ser un número entero mayor o igual a 18'),
+];
+
+// Obtener todos los usuarios
+const getUsers = async (req, res) => {
+    try {
+        const users = await userService.getAllUsers();
+        console.log(users);
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Crear un nuevo usuario
+const createUser = async (req, res) => {
+    // Obtener los errores de validación
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+        const { nombre, apellido, rut, email, password, edad } = req.body;
+
+        // Codificar la contraseña antes de guardarla
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Crear el usuario con la contraseña codificada
+        const newUser = await userService.createUser({
+            nombre,
+            apellido,
+            rut,
+            email,
+            password: hashedPassword, // Guardar la contraseña codificada
+            edad
+        });
+
+        res.status(201).json(newUser);
+    } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            return res.status(400).json({
+                message: 'Error de validación',
+                errors: error.errors.map(e => ({
+                    message: e.message,
+                    field: e.path
+                }))
+            });
+        }
+        res.status(500).json({ message: 'Error al crear usuario', error: error.message });
+    }
+};
+
+// Actualizar un usuario
+const updateUser = async (req, res) => {
+    try {
+        const updatedUser = await userService.updateUser(req.params.id, req.body);
+        res.json(updatedUser);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+};
+
+// Eliminar un usuario
+const deleteUser = async (req, res) => {
+    try {
+        await userService.deleteUser(req.params.id);
+        res.status(204).send();
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+};
+
+
+const getById = async (req, res) => {
+    try{
+       const user = await userService.getUserById(req.params.id);
+        res.status(200).json(user);
+    }catch (error) {
+        res.status(401).json({ message: error.message});
+    }
+}
+
+module.exports = {
+    getUsers,
+    getById,
+    createUser,
+    updateUser,
+    deleteUser,
+    validateUser
+};

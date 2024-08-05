@@ -13,7 +13,7 @@ const app = require('../src/server.js');
   describe('Usuario Controller', () => {
 
     // Prueba para obtener todos los usuarios
-    /*describe('GET /api/usuarios', () => {
+    describe('GET /api/usuarios', () => {
       it('debería obtener todos los usuarios', (done) => {
         chai.request(app)
           .get('/api/usuarios')
@@ -23,7 +23,7 @@ const app = require('../src/server.js');
             done();
           });
       });
-    });*/
+    });
 
     // Prueba para crear un nuevo usuario
     describe('POST /api/usuarios', () => {

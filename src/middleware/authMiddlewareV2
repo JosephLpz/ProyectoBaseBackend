@@ -1,0 +1,30 @@
+// src/middleware/authMiddleware.js
+
+const jwt = require('jsonwebtoken');
+
+// Llave secreta para firmar el JWT
+const SECRET_KEY = 'tu_llave_secreta';
+
+// Middleware para verificar el JWT
+const verifyToken = (req, res, next) => {
+  // Obtener el token de la cabecera de autorización
+  const token = req.headers['authorization'];
+
+  // Verificar si el token existe
+  if (!token) {
+    return res.status(403).json({ message: 'No se proporcionó el token' });
+  }
+
+  // Verificar el token
+  jwt.verify(token, SECRET_KEY, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token inválido o expirado' });
+    }
+
+    // Guardar el usuario decodificado para su uso posterior
+    req.user = decoded;
+    next(); // Continuar hacia el controlador
+  });
+};
+
+module.exports = verifyToken;
